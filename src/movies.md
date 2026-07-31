@@ -1,13 +1,13 @@
 ---
 title: Movie Recommendation
-movie-title: "Sinners"
-movie-poster: "https://a.ltrbxd.com/resized/sm/upload/x1/ne/1h/4u/sinners-1200-1200-675-675-crop-000000.jpg?v=60c0af98f0"
-movie-link: "https://letterboxd.com/film/sinners-2025/"
-movie-rating: "⭐⭐"
+movie-title: "Obsession"
+movie-poster: "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/3/4/4/7/2/tmdb/diOZbaDnB2CIilwd0527AB1qMvW-1200-1200-675-675-crop-000000.jpg?v=e165ee724d"
+movie-link: "https://letterboxd.com/film/obsession-2025/"
+movie-rating: "⭐⭐⭐"
 movie-year: "2025"
-movie-genre: "Thriller, Action, Horror"
+movie-genre: "Thriller, Horror"
 ---
 
 ## Review
 
-The real sin is letting all that potential go to waste
+Prefers the easy gore scenes rather the uncomfortable real plot that makes the movie interesting in the first place.
