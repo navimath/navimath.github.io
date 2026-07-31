@@ -3,7 +3,7 @@ title: Personal webpage
 author: Iván Martínez Comas
 shortbio: PhD Student at LMF
 description-meta: PhD Student at LMF
-og-url: https://ivanmartinez.github.io
+og-url: https://navimath.github.io
 location: Location, office
 email: imcnavi ad lmf.cnrs.fr
 clickable-email: false
