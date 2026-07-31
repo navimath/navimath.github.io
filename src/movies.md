@@ -1,13 +1,13 @@
 ---
 title: Movie Recommendation
-movie-title: "Gone Girl"
-movie-poster: "https://a.ltrbxd.com/resized/sm/upload/6g/ja/bv/xf/gone-girl-1200-1200-675-675-crop-000000.jpg?v=19f256dfa8"
-movie-link: "https://letterboxd.com/film/gone-girl/"
-movie-rating: "★★½"
-movie-year: "2014"
-movie-genre: "Drama, Mystery, Thriller"
+movie-title: "Obsession"
+movie-poster: "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/3/4/4/7/2/tmdb/diOZbaDnB2CIilwd0527AB1qMvW-1200-1200-675-675-crop-000000.jpg?v=e165ee724d"
+movie-link: "https://letterboxd.com/film/obsession-2025/"
+movie-rating: "⭐⭐⭐"
+movie-year: "2025"
+movie-genre: "Thriller, Horror"
 ---
 
 ## Review
 
-A very stupid first half, an even more stupid second part
+Prefers the easy gore scenes rather the uncomfortable real plot that makes the movie interesting in the first place.
