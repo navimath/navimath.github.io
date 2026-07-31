@@ -370,3 +370,106 @@ span.lastupdate {
     justify-content: left;
   }
 }
+
+/* Movie recommendation */
+
+.movie-card {
+    margin-top: 3rem;
+}
+
+
+.movie-card table {
+
+    border-collapse: collapse;
+    width:100%;
+
+}
+
+
+.movie-poster {
+
+    width:300px;
+    vertical-align:top;
+
+}
+
+
+.movie-poster img {
+
+    width:280px;
+    border-radius:12px;
+
+}
+
+
+.movie-info {
+
+    vertical-align:top;
+    padding-left:40px;
+
+}
+
+
+.movie-info h1 {
+
+    margin-top:0;
+
+}
+
+
+.movie-info p {
+
+    line-height:1.6;
+
+}
+
+
+.movie-info a {
+
+    color:#00b020;
+
+}
+
+
+@media(max-width:700px){
+
+.movie-card table,
+.movie-card tr,
+.movie-card td {
+
+    display:block;
+
+}
+
+
+.movie-info {
+
+    padding-left:0;
+    margin-top:20px;
+
+}
+
+
+.movie-poster img {
+
+    width:100%;
+
+}
+
+}
+
+.movie-rating {
+
+    font-size:1.3rem;
+
+}
+
+
+.stars {
+
+    color:#00c030;
+
+    letter-spacing:3px;
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "EmojiOne Color", sans-serif;
+
+}

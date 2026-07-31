@@ -38,3 +38,7 @@ Nothing here (yet).
 # Resume
 
 [My CV](files/cv.pdf)
+
+# Movie of the day
+
+[click here](movies.html)

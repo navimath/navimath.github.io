@@ -1,0 +1,151 @@
+<!--
+  Movie page template based on basicpage.github.io
+  MIT license:
+  https://github.com/basicpage/basicpage.github.io
+-->
+
+<!DOCTYPE html>
+<html prefix="og: https://ogp.me/ns#" lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width">
+
+  <meta name="generator" content="pandoc">
+
+  $for(author-meta)$
+  <meta name="author" content="$author-meta$">
+  $endfor$
+
+  $if(description-meta)$
+  <meta name="description" content="$description-meta$">
+  $endif$
+
+  <title>$pagetitle$</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+  $for(css)$
+  <link rel="stylesheet" href="$css$">
+  $endfor$
+
+  $if(disable-dark-mode)$
+  $else$
+  <link rel="stylesheet" href="dark.css">
+  $endif$
+
+  $for(header-includes)$
+    $header-includes$
+  $endfor$
+
+</head>
+
+
+<body>
+
+<header>
+
+  <aside>
+
+    <h1>
+      🎬 Movie Recommendation
+    </h1>
+
+    <p>
+      A daily film selected from my Letterboxd list.
+    </p>
+
+    <div class="icons">
+
+      $if(github)$
+      <a href="https://github.com/$github$">
+        <i class="fa-brands fa-github fa-fw"></i>
+      </a>
+      $endif$
+
+    </div>
+
+  </aside>
+
+</header>
+
+
+<main>
+
+<div class="movie-card">
+
+<table>
+
+<tr>
+
+<td class="movie-poster">
+
+<img src="$movie-poster$"
+     alt="$movie-title$ poster">
+
+</td>
+
+
+<td class="movie-info">
+
+
+<h1>
+$movie-title$
+</h1>
+
+
+<p>
+<strong>Year:</strong>
+$movie-year$
+</p>
+
+
+<p>
+<strong>Rating:</strong>
+<span class="stars">$movie-rating$</span>
+</p>
+
+$if(movie-genre)$
+<p>
+<strong>Genre:</strong>
+$movie-genre$
+</p>
+$endif$
+
+<p>
+<strong>Letterboxd:</strong>
+
+<a href="$movie-link$">
+View film page
+</a>
+
+</p>
+
+
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+
+$body$
+
+
+</main>
+
+
+<footer>
+
+<p>
+Generated from my Letterboxd recommendations.
+</p>
+
+</footer>
+
+
+</body>
+
+</html>
