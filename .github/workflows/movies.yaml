@@ -25,52 +25,36 @@ jobs:
       with:
         fetch-depth: 0
 
-
     - name: Setup Python
       uses: actions/setup-python@v6
       with:
         python-version: "3.12"
-
 
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install curl_cffi beautifulsoup4
 
-
     - name: Install pandoc
       run: |
         sudo apt-get update
         sudo apt-get install -y pandoc
 
-
     - name: Update movie page
       run: |
         python3 scripts/update_movies.py
-
 
     - name: Build website
       run: |
         make all
 
+    - name: Setup Pages
+      uses: actions/configure-pages@v6
 
-    - name: Commit changes
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: website
 
-        echo "Repository status before commit:"
-        git status --short
-
-        git add src/movies.md website/movies.html website/index.html
-
-        echo "Repository status after staging:"
-        git status --short
-
-        if git diff --cached --quiet; then
-          echo "No changes to commit."
-          exit 0
-        fi
-
-        git commit -m "Update movie recommendation"
-        git push
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v5

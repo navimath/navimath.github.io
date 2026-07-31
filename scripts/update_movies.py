@@ -252,20 +252,30 @@ def yaml_quote(value: str) -> str:
     text = str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").strip()
     return f'"{text}"'
 
+review_text = str(
+    movie.get("review")
+    or film_details.get("review")
+    or "No review written."
+).strip()
+
+cleanup_patterns = [
+    (r"^.*?review published on Letterboxd:\s*", re.IGNORECASE),
+    (r"\s+Translate\s+Translated from\s+by\s*$", re.IGNORECASE),
+    (r"^.*?\b(?:Watched|Liked|Disliked|Reviewed|Added)\b", re.IGNORECASE),
+    (r"^\s*\d{4}\s*", 0),  # Year only
+    (r"^\s*(?:★|☆|[0-9.]+\s*/?\s*5)\s*", 0),  # Rating
+    (r"^\s*(?:Watched|Liked|Disliked|Added)\s*", re.IGNORECASE),
+    (r"^\s*\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}\s*", 0),  # 12 Apr 2025
+    (r"^\s*[A-Za-z]{3,9}\s+\d{4}\s*", 0),  # Apr 2025
+]
+
+for pattern, flags in cleanup_patterns:
+    review_text = re.sub(pattern, "", review_text, flags=flags)
 
 movie_title = str(movie.get("title") or "Movie Recommendation").replace("\n", " ").strip()
 movie_poster = str(movie.get("poster") or "")
 movie_link = str(movie.get("url") or "")
-review_text = str(movie.get("review") or film_details.get("review") or "No review written.").strip()
-review_text = re.sub(r"^.*?review published on Letterboxd:\s*", "", review_text, flags=re.IGNORECASE)
-review_text = re.sub(r"\s+Translate\s+Translated from\s+by\s*$", "", review_text, flags=re.IGNORECASE)
-review_text = re.sub(r"^.*?\b(?:Watched|Liked|Disliked|Reviewed|Added)\b", "", review_text, flags=re.IGNORECASE)
-review_text = re.sub(r"^\s*\d{4}\s*", "", review_text)
-review_text = re.sub(r"^\s*(?:★|☆|[0-9.]+\s*/?\s*5)\s*", "", review_text)
-review_text = re.sub(r"^\s*(?:Watched|Liked|Disliked|Added)\s*", "", review_text, flags=re.IGNORECASE)
-review_text = re.sub(r"^\s*\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}\s*", "", review_text)
 review_text = re.sub(r"\s+", " ", review_text).strip(" -—:")
-review_text = review_text.strip()
 movie_year = str(movie.get("year") or film_details.get("year") or "")
 movie_genre = str(film_details.get("genres") or "")
 rating = extract_rating(review_text, str(movie.get("rating") or ""))
