@@ -1,17 +1,17 @@
 ---
-title: Basicpage template
-author: Your Name
-shortbio: Short bio
-description-meta: Short bio for meta-data
-og-url: https://basicpage.github.io
+title: Personal webpage
+author: Iván Martínez Comas
+shortbio: PhD Student at LMF
+description-meta: PhD Student at LMF
+og-url: https://ivanmartinez.github.io
 location: Location, office
-email: noreply@noemail.com
+email: imcnavi ad lmf.cnrs.fr
 clickable-email: false
 picture: img/profile.png
 picture-round: false
 side-by-side: true
 disable-dark-mode: false
-pronouns: Pronouns
+pronouns: he/him
 og-picture: https://basicpage.github.io/img/profile.png
 orcid: 0000-0000-0000-0000
 dblp: https://dblp.org/
