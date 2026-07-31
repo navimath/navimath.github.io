@@ -1,13 +1,13 @@
 ---
 title: Movie Recommendation
-movie-title: "The Odyssey"
-movie-poster: "https://a.ltrbxd.com/resized/sm/upload/vn/7k/d6/d7/odyssey-1200-1200-675-675-crop-000000.jpg?v=9f3eb79026"
-movie-link: "https://letterboxd.com/film/the-odyssey-2026/"
-movie-rating: "⭐⭐⭐⭐"
-movie-year: "2026"
-movie-genre: "Adventure, Action, Fantasy"
+movie-title: "Obsession"
+movie-poster: "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/3/4/4/7/2/tmdb/diOZbaDnB2CIilwd0527AB1qMvW-1200-1200-675-675-crop-000000.jpg?v=e165ee724d"
+movie-link: "https://letterboxd.com/film/obsession-2025/"
+movie-rating: "⭐⭐⭐"
+movie-year: "2025"
+movie-genre: "Thriller, Horror"
 ---
 
 ## Review
 
-Very nice retelling despite the film not really knowing what it wants to be.
+Prefers the easy gore scenes rather the uncomfortable real plot that makes the movie interesting in the first place.

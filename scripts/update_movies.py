@@ -225,13 +225,16 @@ html = fetch_or_load_html()
 movies = get_reviews(html)
 
 if not movies:
-    raise Exception("No reviews found")
+    raise RuntimeError("No reviews found in the Letterboxd HTML snapshot")
 
 
 movie = select_movie(movies)
 
 film_details = fetch_film_details(str(movie.get("url") or ""))
 movie["poster"] = film_details.get("poster")
+
+if not movie.get("title"):
+    raise RuntimeError("Selected movie is missing a title")
 
 def yaml_quote(value: str) -> str:
     text = str(value).replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ").strip()
