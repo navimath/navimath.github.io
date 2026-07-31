@@ -59,7 +59,13 @@ jobs:
         git config user.name github-actions
         git config user.email github-actions@github.com
 
+        echo "Repository status before commit:"
+        git status --short
+
         git add src/movies.md website/movies.html website/index.html
+
+        echo "Repository status after staging:"
+        git status --short
 
         if git diff --cached --quiet; then
           echo "No changes to commit."

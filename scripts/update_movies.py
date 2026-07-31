@@ -209,10 +209,22 @@ def select_movie(movies: list[dict[str, str | None]]) -> dict[str, str | None]:
     if state_path.exists():
         previous_url = state_path.read_text(encoding="utf-8").strip()
 
-    candidates = movies
-    if previous_url and len(movies) > 1:
-        candidates = [movie for movie in movies if str(movie.get("url") or "").strip() != previous_url]
+    current_title = None
+    if OUTPUT_PATH.exists():
+        existing_text = OUTPUT_PATH.read_text(encoding="utf-8")
+        match = re.search(r'^movie-title:\s*"?(.*?)"?\s*$', existing_text, flags=re.MULTILINE)
+        if match:
+            current_title = match.group(1).strip()
 
+    excluded_urls = set()
+    if previous_url:
+        excluded_urls.add(previous_url)
+    if current_title:
+        for movie in movies:
+            if str(movie.get("title") or "").strip() == current_title:
+                excluded_urls.add(str(movie.get("url") or "").strip())
+
+    candidates = [movie for movie in movies if str(movie.get("url") or "").strip() not in excluded_urls]
     if not candidates:
         candidates = movies
 
@@ -250,7 +262,7 @@ review_text = re.sub(r"\s+Translate\s+Translated from\s+by\s*$", "", review_text
 review_text = re.sub(r"^.*?\b(?:Watched|Liked|Disliked|Reviewed|Added)\b", "", review_text, flags=re.IGNORECASE)
 review_text = re.sub(r"^\s*\d{4}\s*", "", review_text)
 review_text = re.sub(r"^\s*(?:★|☆|[0-9.]+\s*/?\s*5)\s*", "", review_text)
-review_text = re.sub(r"^\s*(?:Watched|Liked|Disliked)\s*", "", review_text, flags=re.IGNORECASE)
+review_text = re.sub(r"^\s*(?:Watched|Liked|Disliked|Added)\s*", "", review_text, flags=re.IGNORECASE)
 review_text = re.sub(r"^\s*\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}\s*", "", review_text)
 review_text = re.sub(r"\s+", " ", review_text).strip(" -—:")
 review_text = review_text.strip()
