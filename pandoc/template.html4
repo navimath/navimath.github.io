@@ -1,0 +1,176 @@
+<!--
+  This webpage is based on the template provided by https://basicpage.github.io/
+  under MIT license:
+  https://github.com/basicpage/basicpage.github.io?tab=MIT-1-ov-file
+
+  Authors:
+  - Yannick Forster
+  - Théo Winterhalter
+-->
+<!DOCTYPE html>
+<html prefix="og: https://ogp.me/ns#" lang="en">
+<head>
+  <meta name="viewport" content="width=device-width">
+  <meta name="generator" content="pandoc">
+  <meta property="og:type" content="website">
+  $for(author-meta)$
+  <meta name="author" content="$author-meta$">
+  $endfor$
+  $if(date-meta)$
+  <meta name="date" content="$date-meta$">
+  $endif$
+  $if(keywords)$
+  <meta name="keywords" content="$for(keywords)$$keywords$$sep$, $endfor$">
+  $endif$
+  $if(description-meta)$
+  <meta name="description" content="$description-meta$">
+  <meta property="og:description" content="$description-meta$">
+  $endif$
+  <title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+  $if(title-prefix)$<meta property="og:site_name" content="$title-prefix$">$endif$
+  <meta property="og:title" content="$pagetitle$">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="academicons/css/academicons.min.css">
+  $for(css)$
+  <link rel="stylesheet" href="$css$">
+  $endfor$
+  $if(disable-dark-mode)$$else$
+  <link rel="stylesheet" href="dark.css">
+  $endif$
+  $if(og-picture)$
+  <meta property="og:image" content="$og-picture$">
+  $endif$
+  $if(og-url)$
+  <meta property="og:url" content="$og-url$">
+  $endif$
+  $for(header-includes)$
+    $header-includes$
+  $endfor$
+  $if(math)$
+  $if(mathjax)$
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  $endif$
+    $math$
+  $endif$
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/img/favicon.svg" />
+  <link rel="shortcut icon" href="/img/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png" />
+  <link rel="manifest" href="/img/site.webmanifest" />
+</head>
+<body>
+  $if(side-by-side)$
+  <header class="split">
+  $else$
+  <header>
+  $endif$
+    $if(picture)$
+      $if(picture-round)$
+      <img class="round-image" src="$picture$" alt="My picture">
+      $else$
+      <img src="$picture$" alt="My picture">
+      $endif$
+    $endif$
+    <aside>
+      $if(author)$
+      <h1>$author$</h1>
+      $endif$
+      $if(shortbio)$
+      <h2>$shortbio$</h2>
+      $endif$
+      $if(pronouns)$
+      <p>$pronouns$</p>
+      $endif$
+      $if(location)$
+      <p><i class="fa-solid fa-location-dot fa-fw"></i> $location$</p>
+      $endif$
+      $if(email)$
+      $for(email)$
+      <p>
+        $if(clickable-email)$<a href="mailto:$email$">$endif$
+          <i class="fa-regular fa-envelope fa-fw"></i> <code>$email$</code>
+        $if(clickable-email)$</a>$endif$
+      </p>
+      $endfor$
+      $endif$
+      <div class="icons">
+        $if(orcid)$
+        <a href="https://orcid.org/$orcid$" title="ORCID">
+          <i class="ai ai-orcid ai-fw icon-pad-right"></i>
+        </a>
+        $endif$
+        $if(dblp)$
+        <a href="$dblp$" title="DBLP">
+          <i class="ai ai-dblp ai-fw icon-pad-right"></i>
+        </a>
+        $endif$
+        $if(hal)$
+        <a href="$hal$" title="HAL">
+          <i class="ai ai-hal ai-fw icon-pad-right"></i>
+        </a>
+        $endif$
+        $if(scholar)$
+        <a href="$scholar$" title="Google Scholar">
+          <i class="ai ai-google-scholar ai-fw icon-pad-right"></i>
+        </a>
+        $endif$
+        $if(github)$
+        <a href="https://github.com/$github$" title="Github: $github$">
+          <i class="fa-brands fa-github fa-fw"></i>
+        </a>
+        $endif$
+        $if(gitlab)$
+        <a href="https://gitlab.com/$gitlab$" title="Gitlab">
+          <i class="fa-brands fa-gitlab fa-fw"></i>
+        </a>
+        $endif$
+        $if(bitbucket)$
+        <a href="$bitbucket$" title="BitBucket">
+          <i class="fa-brands fa-bitbucket fa-fw"></i>
+        </a>
+        $endif$
+        $if(mastodon)$
+        <a href="$mastodon$" title="Mastodon">
+          <i class="fa-brands fa-mastodon fa-fw"></i>
+        </a>
+        $endif$
+        $if(bluesky)$
+        <a href="$bluesky$" title="BlueSky">
+          <i class="fa-brands fa-bluesky fa-fw"></i>
+        </a>
+        $endif$
+        $if(linkedin)$
+        <a href="$linkedin$" title="LinkedIn">
+          <i class="fa-brands fa-linkedin fa-fw"></i>
+        </a>
+        $endif$
+      </div>
+    </aside>
+  </header>
+  $if(toc)$
+  <nav>
+    $table-of-contents$
+  </nav>
+  $endif$
+  <main>
+    $for(include-before)$
+    $include-before$
+    $endfor$
+
+    $body$
+
+    $for(include-after)$
+    $include-after$
+    $endfor$
+  </main>
+  $if(footer)$
+  <footer>
+    $footer$
+
+    <span class="lastupdate">Last updated: $date$</span>
+  </footer>
+  $endif$
+</body>
+</html>

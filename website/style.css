@@ -1,0 +1,372 @@
+:root {
+  --bg: #fbfdff;
+  --headerbg: transparent;
+  --navbg: transparent;
+  --mainbg: transparent;
+  --footerbg: transparent;
+  --navlink: #56473d;
+  --navborder: #56473d;
+}
+
+/*** GENERAL ***/
+
+* {
+  box-sizing: border-box;
+}
+
+body, div, header, footer, main, h1, h2, h3, h4, h5, h6, img, p {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  min-height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 12pt;
+  line-height: 1.6;
+  padding: 1.5rem;
+  word-wrap: break-word;
+}
+
+a {
+  color: #3a6eb1;
+  text-decoration: none;
+}
+
+a:active, a:hover {
+  color: #71acf8;
+  outline: 0;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+/*** HEADER ***/
+
+header {
+  max-width: 920px;
+  width: auto;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* padding: 15px; */
+  background: var(--headerbg);
+  gap: 5px;
+}
+
+header img {
+  /* flex: 1; */
+  max-width: 200px;
+}
+
+header h1 {
+  text-align: center;
+}
+
+header h2 {
+  font-size: medium;
+  text-align: center;
+}
+
+header p {
+  margin: 0;
+  text-align: center;
+}
+
+header div.icons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+header div.icons a {
+  font-size: x-large;
+}
+
+header div.icons a[title] {
+  position: relative;
+}
+
+header div.icons a:hover[title]::after {
+  content: attr(title);
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  white-space: nowrap;
+  background-color: #555;
+  color: #fff;
+  font-style: normal;
+  font-family: sans-serif;
+  font-size: 0.8em;
+  position: absolute;
+  top: 170%;
+  left: 50%;
+  transform: translate(-50%, -1em);
+  z-index: 1;
+}
+
+/*** NAV ***/
+
+nav {
+  max-width: 920px;
+  width: auto;
+  margin: auto;
+  padding: 15px;
+  background: var(--navbg);
+  border-bottom: 1px solid var(--navborder);
+  padding-bottom: 30px;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  gap: 15px;
+}
+
+nav ul li {
+  list-style-type: none;
+}
+
+nav ul li a {
+  font-size: large;
+  color: var(--navlink);
+  border-bottom: 3px dotted var(--navlink);
+  padding-bottom: 0.2em;
+  margin: 0.3em;
+}
+
+nav ul li a:hover {
+  color: var(--navlink);
+  border-bottom: 3px solid var(--navlink);
+}
+
+/*** MAIN ***/
+
+main {
+  width: auto;
+  margin: auto;
+  max-width: 920px;
+  background: var(--mainbg);
+  /* padding: 15px; */
+  padding-top: 30px;
+}
+
+main p {
+  margin-bottom: 6px;
+}
+
+main h1, main h2 {
+  margin: 15px 0;
+}
+
+main h3, main h4, main h5, main h6 {
+  margin-bottom: 6px;
+}
+
+/*** FOOTER ***/
+
+footer {
+  width: auto;
+  margin: auto;
+  max-width: 920px;
+  background: var(--footerbg);
+  /* padding: 15px; */
+  padding-top: 30px;
+  border-top: 1px solid var(--navborder);
+}
+
+/* KBD (keyboard) */
+
+kbd {
+  background-color: #eee;
+  border-radius: 3px;
+  border: 1px solid #b4b4b4;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.2),
+    0 2px 0 0 rgba(255, 255, 255, 0.7) inset;
+  color: #333;
+  display: inline-block;
+  font-size: 0.85em;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 4px;
+  white-space: nowrap;
+}
+
+/* ALERTS */
+
+div.tip {
+  border-left: 4px solid rgb(48, 148, 48);
+  padding-left: 10px;
+}
+
+div.tip > div.title p {
+  color: rgb(48, 148, 48);
+  font-weight: bold;
+}
+
+div.tip > div.title p::before {
+  font-family: "Font Awesome 6 Free";
+  content: '\f0eb';
+  margin-right: 4px;
+}
+
+div.important {
+  border-left: 4px solid rgb(115, 32, 136);
+  padding-left: 10px;
+}
+
+div.important > div.title p {
+  color: rgb(115, 32, 136);
+  font-weight: bold;
+}
+
+div.important > div.title p::before {
+  font-family: "Font Awesome 6 Free";
+  content: '\f27a';
+  margin-right: 4px;
+}
+
+div.warning {
+  border-left: 4px solid rgb(233, 170, 46);
+  padding-left: 10px;
+}
+
+div.warning > div.title p {
+  color: rgb(233, 170, 46);
+  font-weight: bold;
+}
+
+div.warning > div.title p::before {
+  font-family: "Font Awesome 6 Free";
+  content: '\f071';
+  margin-right: 4px;
+}
+
+div.caution {
+  border-left: 4px solid rgb(233, 46, 83);
+  padding-left: 10px;
+}
+
+div.caution > div.title p {
+  color: rgb(233, 46, 83);
+  font-weight: bold;
+}
+
+div.caution > div.title p::before {
+  font-family: "Font Awesome 6 Free";
+  content: '\f06a';
+  margin-right: 4px;
+}
+
+div.note {
+  border-left: 4px solid rgb(46, 93, 233);
+  padding-left: 10px;
+}
+
+div.note > div.title p {
+  color: rgb(46, 93, 233);
+  font-weight: bold;
+}
+
+div.note > div.title p::before {
+  font-family: "Font Awesome 6 Free";
+  content: '\f05a';
+  margin-right: 4px;
+}
+
+/* CLASSES */
+
+.round-image {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+section.paper {
+  border-left: 4px solid rgb(102, 102, 110);
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+section.paper h3 {
+  margin: 0;
+}
+
+section.paper p {
+  color: rgb(136, 136, 136);
+  margin: 0;
+}
+
+div.files {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 0;
+}
+
+div.files a {
+  border-radius: 5px;
+  padding: 4px;
+  margin-right: 5px;
+  background: #e5e7e8;
+  color: #343d44;
+  font-size: small;
+}
+
+div.files a:hover {
+  background: #91c3ea;
+  text-decoration: none;
+}
+
+div.awards {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px 0;
+}
+
+div.awards span {
+  border-radius: 5px;
+  padding: 4px;
+  margin-right: 5px;
+  background: #F6ECD0;
+  color: #CF9C11;
+}
+
+span.lastupdate {
+  color: #9e9d9d;
+}
+
+@media screen and (min-width: 1000px) {
+  header.split {
+    flex-direction: row;
+    gap: 2em;
+  }
+
+  header.split h1, header.split h2, header.split p {
+    text-align: left;
+  }
+
+  header div.icons {
+    justify-content: left;
+  }
+}
