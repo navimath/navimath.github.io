@@ -1,5 +1,5 @@
 ---
-title: Personal webpage
+title: Iván Martínez Homepage
 author: Iván Martínez Comas
 shortbio: PhD Student at LMF
 description-meta: Iván Martínez Comas, PhD Student at LMF
@@ -7,12 +7,12 @@ og-url: https://navimath.github.io
 location: ENS Paris-Saclay, Office 3S62
 email: ivan.martinez-comas [ad] inria [dot] fr 
 clickable-email: false
-picture: img/mepicture.png
+picture: img/profile.png
 picture-round: false
 side-by-side: true
 disable-dark-mode: false
 pronouns: he/him
-og-picture: https://navimath.github.io/img/mepicture.png
+og-picture: https://navimath.github.io/img/profile.png
 orcid: 0009-0006-3153-2888
 github: navimath
 footer: >-
