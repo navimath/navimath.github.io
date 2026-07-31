@@ -12,7 +12,7 @@ picture-round: false
 side-by-side: true
 disable-dark-mode: false
 pronouns: he/him
-og-picture: https://basicpage.github.io/img/mepicture.png
+og-picture: https://navimath.github.io/img/mepicture.png
 orcid: 0009-0006-3153-2888
 github: navimath
 footer: >-
