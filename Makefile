@@ -2,7 +2,7 @@
 
 website:
 	pandoc --standalone \
-         --from commonmark_x+alerts \
+         --from markdown \
          --output=website/index.html \
          --template=pandoc/template.html4 \
          --css=style.css \
@@ -19,7 +19,7 @@ movies:
 
 	pandoc \
 		--standalone \
-		--from commonmark_x+alerts \
+		--from markdown \
 		--output=website/movies.html \
 		--template=pandoc/mediareview.html4 \
 		--css=style.css \
