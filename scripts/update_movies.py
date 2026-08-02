@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import random
 import re
 
 from bs4 import BeautifulSoup
 from curl_cffi import requests
 
-URL = "https://letterboxd.com/its_navi/reviews/by/added/"
+# URL1 = "https://letterboxd.com/its_navi/reviews/by/added/"
+URL = "https://letterboxd.com/its_navi/films/"
+PROFILE_REVIEWS_URL = "https://letterboxd.com/its_navi/reviews/by/added/"
 HTML_PATH = Path("letterboxd_debug.html")
 OUTPUT_PATH = Path("src/movies.md")
 
 
 def fetch_or_load_html() -> str:
-    if HTML_PATH.exists():
-        return HTML_PATH.read_text(encoding="utf-8")
 
     headers = {
         "User-Agent": (
@@ -37,9 +37,77 @@ def fetch_or_load_html() -> str:
     return html
 
 
+def normalize_poster_candidate(candidate: str | None) -> str | None:
+    if not candidate:
+        return None
+
+    candidate = candidate.strip()
+    if not candidate:
+        return None
+
+    lowered = candidate.lower()
+    if "default-share" in lowered or "empty-poster" in lowered:
+        return None
+
+    if candidate.startswith("/"):
+        return urljoin("https://letterboxd.com", candidate)
+
+    if candidate.startswith("http://") or candidate.startswith("https://"):
+        return candidate
+
+    return None
+
+
 def get_reviews(html: str) -> list[dict[str, str | None]]:
     soup = BeautifulSoup(html, "html.parser")
     movies: list[dict[str, str | None]] = []
+
+    for item in soup.select("li.griditem"):
+        react_component = item.select_one("div.react-component")
+        if not react_component:
+            continue
+
+        title = (
+            react_component.get("data-item-name")
+            or react_component.get("data-item-full-display-name")
+            or ""
+        ).strip()
+
+        film_url = react_component.get("data-target-link") or react_component.get("data-item-link") or ""
+        movie_url = urljoin("https://letterboxd.com", film_url) if film_url else None
+
+        review_url = None
+        if movie_url:
+            parsed = urlparse(movie_url)
+            slug = parsed.path.rstrip("/").split("/")[-1]
+            if slug:
+                review_url = f"https://letterboxd.com/its_navi/film/{slug}/"
+
+        rating = None
+        rating_tag = item.select_one("span.rating")
+        if rating_tag:
+            rating = rating_tag.get_text(" ", strip=True)
+
+        poster = None
+        poster_candidate = react_component.get("data-poster-url")
+        if poster_candidate:
+            poster = normalize_poster_candidate(poster_candidate)
+
+        if title and movie_url:
+            movies.append(
+                {
+                    "title": title,
+                    "url": movie_url,
+                    "review_url": review_url,
+                    "poster": poster,
+                    "review": None,
+                    "year": None,
+                    "rating": rating,
+                }
+            )
+
+    if movies:
+        return movies
 
     for review in soup.select("article.production-viewing.js-production-viewing"):
         title_tag = review.select_one("h2.primaryname.prettify a")
@@ -77,6 +145,7 @@ def get_reviews(html: str) -> list[dict[str, str | None]]:
                 {
                     "title": title,
                     "url": movie_url,
+                    "review_url": None,
                     "poster": None,
                     "review": review_text,
                     "year": year,
@@ -87,7 +156,118 @@ def get_reviews(html: str) -> list[dict[str, str | None]]:
     return movies
 
 
-def fetch_film_details(movie_url: str) -> dict[str, str | None]:
+def extract_review_from_profile_listing(html: str, movie_url: str | None = None) -> str:
+    soup = BeautifulSoup(html, "html.parser")
+    if not movie_url:
+        return ""
+
+    parsed = urlparse(movie_url)
+    film_slug = parsed.path.rstrip("/").split("/")[-1]
+    if not film_slug:
+        return ""
+
+    for article in soup.select("article.production-viewing"):
+        title_link = article.select_one("h2.primaryname.prettify a")
+        if not title_link:
+            continue
+
+        href = title_link.get("href", "")
+        if not href:
+            continue
+
+        href_slug = href.rstrip("/").split("/")[-1]
+        if href_slug != film_slug:
+            continue
+
+        review_block = article.select_one("div.js-review div.body-text, div.js-review .body-text")
+        if review_block:
+            text = review_block.get_text(" ", strip=True)
+            if text:
+                return text
+
+    return ""
+
+
+def fetch_film_genres(movie_url: str, headers: dict[str, str] | None = None) -> str | None:
+    if not headers:
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+            )
+        }
+
+    parsed = urlparse(movie_url)
+    film_slug = parsed.path.rstrip("/").split("/")[-1]
+    if not film_slug:
+        return None
+
+    genre_url = f"https://letterboxd.com/film/{film_slug}/genres/"
+    try:
+        response = requests.get(genre_url, headers=headers, impersonate="chrome")
+        response.raise_for_status()
+    except Exception:
+        return None
+
+    genre_soup = BeautifulSoup(response.text, "html.parser")
+    genres: list[str] = []
+    for genre_link in genre_soup.select("a[href*='/genre/']"):
+        label = genre_link.get_text(" ", strip=True)
+        if label:
+            genres.append(label)
+
+    unique_genres = list(dict.fromkeys(genres))
+    return ", ".join(unique_genres) if unique_genres else None
+
+
+def extract_poster_url_from_html(html: str, movie_url: str | None = None) -> str | None:
+    soup = BeautifulSoup(html, "html.parser")
+    candidate_urls: list[str] = []
+
+    meta_tag = soup.select_one('meta[property="og:image"]') or soup.select_one(
+        'meta[name="twitter:image"]'
+    )
+    if meta_tag and meta_tag.get("content"):
+        candidate_urls.append(meta_tag.get("content", ""))
+
+    for selector in [
+        'img[data-testid="poster"]',
+        'img.poster',
+        'img[class*="poster"]',
+        'img[alt*="poster"]',
+        'img[data-tmdb-id]',
+    ]:
+        poster_tag = soup.select_one(selector)
+        if poster_tag:
+            src = poster_tag.get("src") or poster_tag.get("data-src") or poster_tag.get("data-original")
+            if src:
+                candidate_urls.append(src)
+
+    for candidate in soup.select("img"):
+        src = candidate.get("src") or candidate.get("data-src") or candidate.get("data-original")
+        if not src:
+            continue
+        candidate_urls.append(src)
+
+    for element in soup.select("[data-poster-url]"):
+        candidate_urls.append(element.get("data-poster-url", ""))
+
+    for tag in soup.select('script[type="application/ld+json"]'):
+        script_text = tag.get_text(" ", strip=True)
+        if "image" in script_text.lower():
+            image_match = re.search(r'"image"\s*:\s*"([^"]+)"', script_text)
+            if image_match:
+                candidate_urls.append(image_match.group(1))
+
+    for candidate in candidate_urls:
+        normalized = normalize_poster_candidate(candidate)
+        if normalized:
+            return normalized
+
+    return None
+
+
+def fetch_film_details(movie_url: str, review_url: str | None = None) -> dict[str, str | None]:
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -95,65 +275,111 @@ def fetch_film_details(movie_url: str) -> dict[str, str | None]:
         )
     }
 
-    try:
-        response = requests.get(movie_url, headers=headers, impersonate="chrome")
-        response.raise_for_status()
-        film_html = response.text
-    except Exception:
-        return {"poster": None, "review": None, "year": None}
-
-    film_soup = BeautifulSoup(film_html, "html.parser")
-
     poster = None
-    meta_tag = film_soup.select_one('meta[property="og:image"]') or film_soup.select_one(
-        'meta[name="twitter:image"]'
-    )
-    if meta_tag and meta_tag.get("content"):
-        poster = meta_tag.get("content")
-
-    if not poster:
-        poster_tag = film_soup.select_one('img[data-testid="poster"]')
-        if poster_tag:
-            poster = poster_tag.get("src") or poster_tag.get("data-src") or poster_tag.get("data-original")
-
-    if not poster:
-        for candidate in film_soup.select("img"):
-            src = candidate.get("src") or candidate.get("data-src") or candidate.get("data-original")
-            if not src:
-                continue
-            if "poster" in src.lower() or "film" in src.lower():
-                poster = src
-                break
-
     review_text = ""
-    for selector in [
-        "div.body-text.js-review-body",
-        "div.body-text.-prose.-reset.js-review-body.js-collapsible-text",
-        "div.review",
-        ".review",
-    ]:
-        review_block = film_soup.select_one(selector)
-        if review_block:
-            review_text = review_block.get_text(" ", strip=True)
+    genre_text = fetch_film_genres(movie_url, headers)
+
+    try:
+        profile_response = requests.get(
+            PROFILE_REVIEWS_URL,
+            headers=headers,
+            impersonate="chrome",
+        )
+        profile_response.raise_for_status()
+        profile_reviews_html = profile_response.text
+    except Exception:
+        profile_reviews_html = None
+
+    if not review_text and profile_reviews_html:
+        review_text = extract_review_from_profile_listing(profile_reviews_html, movie_url)
+
+    candidate_urls = []
+    if review_url:
+        candidate_urls.append(review_url)
+        if review_url.endswith("/"):
+            base = review_url.rstrip("/")
+            candidate_urls.extend(
+                [
+                    f"{base}/reviews/",
+                    f"{base}/reviews/by/added/",
+                ]
+            )
+
+    if movie_url:
+        candidate_urls.insert(0, movie_url)
+
+    if not candidate_urls:
+        return {"poster": None, "review": None, "year": None, "genres": None}
+
+    for target_url in candidate_urls:
+        try:
+            response = requests.get(target_url, headers=headers, impersonate="chrome")
+            response.raise_for_status()
+            film_html = response.text
+        except Exception:
+            continue
+
+        film_soup = BeautifulSoup(film_html, "html.parser")
+
+        if not genre_text:
+            genre_text = fetch_film_genres(movie_url, headers)
+
+        if not poster:
+            poster = extract_poster_url_from_html(film_html, movie_url)
+
+        if not genre_text:
+            genres: list[str] = []
+            for genre_link in film_soup.select("a[href*='/genre/']"):
+                label = genre_link.get_text(" ", strip=True)
+                if label:
+                    genres.append(label)
+
+            if not genres:
+                for candidate in film_soup.select("a, span, div"):
+                    text = candidate.get_text(" ", strip=True)
+                    if not text:
+                        continue
+                    if re.search(r"\b(Drama|Comedy|Thriller|Horror|Action|Adventure|Crime|Romance|Fantasy|Science Fiction|Sci-Fi|Mystery|Animation|Family|Documentary|War|Western|History|Music|TV Movie)\b", text):
+                        genres.append(text)
+
+            unique_genres = list(dict.fromkeys(genres))
+            genre_text = ", ".join(unique_genres) if unique_genres else None
+
+        if review_url and target_url.startswith(review_url.rstrip("/")):
+            if not review_text and profile_reviews_html:
+                review_text = extract_review_from_profile_listing(profile_reviews_html, movie_url)
             if review_text:
-                break
+                review_text = review_text.strip()
+            else:
+                review_selectors = [
+                    "div.body-text.js-review-body",
+                    "div.body-text.-prose.-reset.js-review-body.js-collapsible-text",
+                    "div.review",
+                    ".review",
+                    "div.body-text",
+                    "div.prose",
+                ]
+                for selector in review_selectors:
+                    review_block = film_soup.select_one(selector)
+                    if review_block:
+                        review_text = review_block.get_text(" ", strip=True)
+                        if review_text:
+                            break
 
-    year = None
-    if review_text:
-        match = re.search(r"\b(19|20)\d{2}\b", review_text)
-        if match:
-            year = match.group(0)
+                if not review_text:
+                    paragraphs = [
+                        paragraph.get_text(" ", strip=True)
+                        for paragraph in film_soup.select("div.body-text p, .review p, .js-review-body p")
+                    ]
+                    review_text = " ".join(part for part in paragraphs if part).strip()
 
-    genres: list[str] = []
-    for genre_link in film_soup.select("a[href*='/genre/']"):
-        label = genre_link.get_text(" ", strip=True)
-        if label:
-            genres.append(label)
+        if review_url and review_text:
+            break
 
-    unique_genres = list(dict.fromkeys(genres))
-    genre_text = ", ".join(unique_genres) if unique_genres else None
+        if genre_text and (poster or not review_url):
+            break
 
-    return {"poster": poster, "review": review_text, "year": year, "genres": genre_text}
+    return {"poster": poster, "review": review_text, "year": None, "genres": genre_text}
 
 
 def extract_rating(review_text: str, raw_rating: str | None = None) -> str:
@@ -177,15 +403,20 @@ def extract_rating(review_text: str, raw_rating: str | None = None) -> str:
     return "No rating"
 
 
-def rating_to_stars(rating: str) -> str:
-    """Convert Letterboxd-style ratings into emoji stars."""
-    if not rating or rating == "No rating":
+def rating_to_moons(rating: str) -> str:
+    """Convert Letterboxd-style ratings into emoji moons."""
+    if rating == "No rating":
         return "No rating"
 
-    if re.fullmatch(r"[★☆\s]+", rating):
+    if re.fullmatch(r"[★☆½\s]+", rating):
         full = rating.count("★")
+        half = "½" in rating
         empty = rating.count("☆")
-        return "⭐" * full + "☆" * empty
+        result = "🌕" * full
+        if half:
+            result += "🌗"
+        result += "🌑" * empty
+        return result
 
     try:
         value = float(rating)
@@ -196,10 +427,10 @@ def rating_to_stars(rating: str) -> str:
     half = value - full >= 0.5
     empty = 5 - full - (1 if half else 0)
 
-    result = "⭐" * full
+    result = "🌕" * full
     if half:
-        result += "⭐"
-    result += "☆" * empty
+        result += "🌗"
+    result += "🌑" * empty
     return result
 
 
@@ -242,8 +473,12 @@ if not movies:
 
 movie = select_movie(movies)
 
-film_details = fetch_film_details(str(movie.get("url") or ""))
-movie["poster"] = film_details.get("poster")
+film_details = fetch_film_details(
+    str(movie.get("url") or ""),
+    str(movie.get("review_url") or "") or None,
+)
+movie["poster"] = film_details.get("poster") or movie.get("poster")
+movie["review"] = film_details.get("review")
 
 if not movie.get("title"):
     raise RuntimeError("Selected movie is missing a title")
@@ -276,10 +511,9 @@ movie_title = str(movie.get("title") or "Movie Recommendation").replace("\n", " 
 movie_poster = str(movie.get("poster") or "")
 movie_link = str(movie.get("url") or "")
 review_text = re.sub(r"\s+", " ", review_text).strip(" -—:")
-movie_year = str(movie.get("year") or film_details.get("year") or "")
 movie_genre = str(film_details.get("genres") or "")
 rating = extract_rating(review_text, str(movie.get("rating") or ""))
-stars = rating_to_stars(rating)
+stars = rating_to_moons(rating)
 
 markdown = f"""---
 title: Movie Recommendation
@@ -287,7 +521,6 @@ movie-title: {yaml_quote(movie_title)}
 movie-poster: {yaml_quote(movie_poster)}
 movie-link: {yaml_quote(movie_link)}
 movie-rating: {yaml_quote(stars)}
-movie-year: {yaml_quote(movie_year)}
 movie-genre: {yaml_quote(movie_genre)}
 ---
 
