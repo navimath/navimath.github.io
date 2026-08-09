@@ -93,13 +93,6 @@
 $movie-title$
 </h1>
 
-
-<p>
-<strong>Year:</strong>
-$movie-year$
-</p>
-
-
 <p>
 <strong>Rating:</strong>
 <span class="stars">$movie-rating$</span>

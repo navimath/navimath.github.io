@@ -10,7 +10,7 @@ from curl_cffi import requests
 
 # URL1 = "https://letterboxd.com/its_navi/reviews/by/added/"
 URL = "https://letterboxd.com/its_navi/films/"
-PROFILE_REVIEWS_URL = "https://letterboxd.com/its_navi/reviews/by/added/"
+PROFILE_REVIEWS_URL = "https://letterboxd.com/its_navi/film/"
 HTML_PATH = Path("letterboxd_debug.html")
 OUTPUT_PATH = Path("src/movies.md")
 
@@ -156,30 +156,33 @@ def get_reviews(html: str) -> list[dict[str, str | None]]:
     return movies
 
 
-def extract_review_from_profile_listing(html: str, movie_url: str | None = None) -> str:
+def extract_review_from_profile_film_page(html: str) -> str:
+    """Extract the user's review from an individual Letterboxd film page."""
     soup = BeautifulSoup(html, "html.parser")
-    if not movie_url:
-        return ""
 
-    parsed = urlparse(movie_url)
-    film_slug = parsed.path.rstrip("/").split("/")[-1]
-    if not film_slug:
-        return ""
+    # Primary selector for the review body on a profile film page.
+    selectors = [
+        "div.js-review div.body-text",
+        "div.js-review .body-text",
+        "div.review div.body-text",
+        "div.review .body-text",
+        "div.body-text.js-review-body",
+        "div.js-review-body",
+        "div.body-text.-prose.-reset",
+    ]
 
-    for article in soup.select("article.production-viewing"):
-        title_link = article.select_one("h2.primaryname.prettify a")
-        if not title_link:
-            continue
+    for selector in selectors:
+        review_block = soup.select_one(selector)
+        if review_block:
+            text = review_block.get_text(" ", strip=True)
+            if text:
+                return text
 
-        href = title_link.get("href", "")
-        if not href:
-            continue
-
-        href_slug = href.rstrip("/").split("/")[-1]
-        if href_slug != film_slug:
-            continue
-
-        review_block = article.select_one("div.js-review div.body-text, div.js-review .body-text")
+    # Fallback: look for review/article containers.
+    for article in soup.select("article"):
+        review_block = article.select_one(
+            "div.body-text, div.js-review-body, div.review"
+        )
         if review_block:
             text = review_block.get_text(" ", strip=True)
             if text:
@@ -280,8 +283,11 @@ def fetch_film_details(movie_url: str, review_url: str | None = None) -> dict[st
     genre_text = fetch_film_genres(movie_url, headers)
 
     try:
+        
+        profile_review_url = review_url    
+    
         profile_response = requests.get(
-            PROFILE_REVIEWS_URL,
+            profile_review_url,
             headers=headers,
             impersonate="chrome",
         )
@@ -291,7 +297,7 @@ def fetch_film_details(movie_url: str, review_url: str | None = None) -> dict[st
         profile_reviews_html = None
 
     if not review_text and profile_reviews_html:
-        review_text = extract_review_from_profile_listing(profile_reviews_html, movie_url)
+        review_text = extract_review_from_profile_film_page(profile_reviews_html)
 
     candidate_urls = []
     if review_url:
@@ -347,7 +353,7 @@ def fetch_film_details(movie_url: str, review_url: str | None = None) -> dict[st
 
         if review_url and target_url.startswith(review_url.rstrip("/")):
             if not review_text and profile_reviews_html:
-                review_text = extract_review_from_profile_listing(profile_reviews_html, movie_url)
+                review_text = extract_review_from_profile_film_page(profile_reviews_html, movie_url)
             if review_text:
                 review_text = review_text.strip()
             else:
